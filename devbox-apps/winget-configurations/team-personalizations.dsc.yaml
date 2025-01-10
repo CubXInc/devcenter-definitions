@@ -1,0 +1,226 @@
+properties:
+  configurationVersion: 0.2.0
+  ########################################
+  ### ASSERTIONS: System Requirements
+  ########################################
+  assertions:
+    ### Assertion: OS Version
+    ### -------------------------------------
+    - resource: Microsoft.Windows.Developer/OsVersion
+      id: OsVersion
+      directives:
+        description: Minimum OS version requirement
+        allowPrerelease: true
+      settings:
+        MinVersion: "10.0.22000"
+  ########################################
+  ### RESOURCES: System Configuration
+  ########################################
+  resources:
+   ### Enable: Developer Mode
+   ### -------------------------------------
+   - resource: Microsoft.Windows.Developer/DeveloperMode
+     id: developermode
+     directives:
+       description: Enable Developer Mode
+       allowPrerelease: true
+     settings:
+       Ensure: Present
+    ### Show file extensions and hidden files
+    ### -------------------------------------
+   ### Enable: Show File Extensions and Hidden Files
+   ### -------------------------------------
+   - resource: Microsoft.Windows.Developer/WindowsExplorer
+     id: hiddenfilesshow
+     directives:
+       description: Show File Extensions and hidden files
+       allowPrerelease: true
+     settings:
+       FileExtensions: Show
+       HiddenFiles: Show
+   ### Set theme to Dark
+   ### -------------------------------------
+   - resource: Microsoft.Windows.Developer/EnableDarkMode
+     id: darkmode
+     directives:
+       description: Set theme to Dark
+       allowPrerelease: true
+     settings:
+       Ensure: Present
+       RestartExplorer: true
+########################################
+   ### Install Powershell
+   ### -------------------------------------
+   - resource: Microsoft.WinGet.DSC/WinGetPackage
+     id: powershell
+     directives:
+       description: Install Powershell
+       allowPrerelease: true
+     settings:
+       id: Microsoft.PowerShell
+########################################
+
+   ### Install Docker
+   ### -------------------------------------
+   - resource: Microsoft.WinGet.DSC/WinGetPackage
+     id: docker
+     directives:
+       description: Install Docker
+       allowPrerelease: true
+     settings:
+       id: Docker.DockerDesktop
+       ensure: Present
+     SetScript: |
+        net localgroup docker-users "NT AUTHORITY\Authenticated Users" /ADD
+   ### Install MongoDB Compass
+   ### -------------------------------------
+   - resource: Microsoft.WinGet.DSC/WinGetPackage
+     id: mongodbcompass
+     directives:
+       description: Install MongoDB Compass
+       allowPrerelease: true
+     settings:
+       id: MongoDB.Compass.Full
+       ensure: Present
+   ### Install Postman
+   ### -------------------------------------
+   - resource: Microsoft.WinGet.DSC/WinGetPackage
+     id: postman
+     directives:
+       description: Install Postman
+       allowPrerelease: true
+     settings:
+       id: Postman.Postman
+       ensure: Present
+   ### Install Lens
+   ### -------------------------------------
+   - resource: Microsoft.WinGet.DSC/WinGetPackage
+     id: lens
+     directives:
+       description: Install Lens
+       allowPrerelease: true
+     settings:
+       id: Mirantis.Lens
+       ensure: Present
+   ### Install Azure Storage Explorer
+   ### -------------------------------------
+   - resource: Microsoft.WinGet.DSC/WinGetPackage
+     id: storageexplorer
+     directives:
+       description: Install Storage Explorer
+       allowPrerelease: true
+     settings:
+       id: Microsoft.Azure.StorageExplorer
+       ensure: Present
+########################################
+   ### Install NodeJS
+   ### -------------------------------------
+   - resource: Microsoft.WinGet.DSC/WinGetPackage
+     id: CoreyButler.NVMforWindows
+     directives:
+       description: Install NodeJS
+     settings:
+       id: CoreyButler.NVMforWindows
+########################################
+   ### Install Visual Studio Code and Extensions
+   ### Install Visual Studio Code
+   ### -------------------------------------
+   - resource: Microsoft.WinGet.DSC/WinGetPackage
+     id: vscode
+     directives:
+       description: Install Microsoft Visual Studio Code
+       allowPrerelease: true
+     settings:
+       id: Microsoft.VisualStudioCode
+       ensure: Present
+########################################
+   ### Install and Configure Oh My Posh
+   ### Install oh-my-posh
+   ### -------------------------------------
+   - resource: Microsoft.WinGet.DSC/WinGetPackage
+     id: OMP
+     directives:
+       description: Install Oh My Posh
+       allowPrerelease: true
+     settings:
+       id: JanDeDobbeleer.OhMyPosh
+   ### Install Visual Studio Code and Extensions
+   ### Install VS Code Extensions
+   ### -------------------------------------
+   - resource: PSDscResources/Script
+     id: vscodeextensions
+     directives:
+       description: Install Basic VS Code Extensions
+     settings:
+       SetScript: |
+         $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+         code --install-extension ms-vscode.powershell
+         code --install-extension ms-vscode.vscode-node-azure-pack
+         code --install-extension ms-azuretools.azure-dev
+         code --install-extension DevCenter.ms-devbox
+         code --install-extension GitHub.vscode-github-actions
+         code --install-extension esbenp.prettier-vscode
+         code --install-extension ipedrazas.kubernetes-snippets
+         code --install-extension ms-azuretools.azure-dev
+         code --install-extension ms-azuretools.vscode-azurecontainerapps
+         code --install-extension ms-azuretools.vscode-azurefunctions
+         code --install-extension ms-azuretools.vscode-azurestorage
+         code --install-extension ms-azuretools.vscode-docker
+         code --install-extension ms-kubernetes-tools.aks-devx-tools
+         code --install-extension ms-kubernetes-tools.vscode-aks-tools
+         code --install-extension ms-kubernetes-tools.vscode-kubernetes-tools
+         code --install-extension redhat.vscode-yaml
+         code --install-extension esbenp.prettier-vscode
+         code --install-extension prompt-flow.prompt-flow
+         code --install-extension ms-toolsai.jupyter-renderers
+         code --install-extension ms-vscode-remote.vscode-remote-extensionpack
+         code --install-extension formulahendry.auto-rename-tag
+         code --install-extension exodiusstudios.comment-anchors
+         code --install-extension dotenv.dotenv-vscode
+         code --install-extension dbaeumer.vscode-eslint
+         code --install-extension github.copilot
+         code --install-extension maattdd.gitless
+         code --install-extension prisma.prisma
+         code --install-extension chakrounanas.turbo-console-log
+         code --install-extension bradlc.vscode-tailwindcss
+
+         # COPY SETTINGS.JSON
+
+         $sourcePath = "c:\src\devcenter-definitions\devbox-apps\settings-file\vscode\settings.json"
+         $destinationDir = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::ApplicationData)
+         $destinationPath = Join-Path -Path $destinationDir -ChildPath "Code\User\settings.json"
+
+         if (-not (Test-Path -Path $destinationDir)) {
+           New-Item -ItemType Directory -Path $destinationDir -Force
+         }
+
+         # Copy the file, overwriting if it exists
+         Copy-Item -Path $sourcePath -Destination $destinationPath -Force
+       GetScript: return $false
+       TestScript: return $false
+########################################
+   ### Remove Temporary GitHub Repo
+   ### -------------------------------------
+   - resource: PSDscResources/Script
+     id: removerepo
+     directives:
+       description: Remove Temporary Git Repo
+     settings:
+       SetScript: |
+         $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+         Remove-Item -Path "c:\src\devcenter-definitions\" -Recurse -Force
+       GetScript: return $false
+       TestScript: return $false
+########################################
+   ### Reboot Dev Box
+   ### -------------------------------------
+   - resource: PSDscResources/Script
+     id: reboot
+     directives:
+       description: Reboot Dev Box
+     settings:
+       SetScript: |
+         $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+         shutdown /r /f
+       GetScript: return $false
+       TestScript: return $false       
