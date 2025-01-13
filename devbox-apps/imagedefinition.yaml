@@ -3,7 +3,7 @@ name: "devbox-customization"
 image: microsoftwindowsdesktop_windows-ent-cpc_win11-24H2-ent-cpc
 description: "This definition is for the CubX developers, and includes the tools and configurations they need to be productive."
 
-tasks:
+userTasks:
   - name: git-clone
     description: 'Clone this repository into C:\src'
     parameters:
